@@ -1,0 +1,56 @@
+name: Build Game
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    name: Build on Linux
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Make build.sh executable
+        run: chmod +x build.sh
+
+      - name: Run build script
+        run: ./build.sh
+
+      - name: Prepare artifact folder
+        run: |
+          mkdir -p wizard-nest/binaries
+          cp ./build/your_game_binary ./wizard-nest/binaries/
+          cp -r ./assets ./wizard-nest/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: wizard-nest-linux
+          path: wizard-nest/
+
+  build-windows:
+    runs-on: windows-latest
+    name: Build on Windows
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run build script
+        run: .\build.bat
+
+      - name: Prepare artifact folder
+        run: |
+          mkdir wizard-nest\binaries
+          copy .\build\your_game_binary.exe wizard-nest\binaries\
+          xcopy assets wizard-nest\assets /E /I /Y
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: wizard-nest-windows
+          path: wizard-nest/
+
